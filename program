@@ -1,0 +1,75 @@
+//User class class User {     protected int userId;     protected String name;     protected String email;     protected double rating;     protected String role; // Seller / Buyer 
+ 
+    public User(int userId, String name, String email, double rating, String role) {         this.userId = userId;         this.name = name;         this.email = email;         this.rating = rating;         this.role = role; 
+    } 
+ 
+    public String getRole() { return role; }     public String getName() { return name; }     public int getUserId() { return userId; } 
+ 
+    public void display() { 
+        System.out.println("User: " + name + " (" + role + ")"); 
+    } 
+} 
+//VerifiedSeller class VerifiedSeller extends User {     private double feePercent = 2.0; 
+ 
+    public VerifiedSeller(int userId, String name, String email, double rating) {         super(userId, name, email, rating, "Seller"); 
+    } 
+    public void display() { 
+        System.out.println("Verified Seller: " + name + " (Fee: " + feePercent + "%)"); 
+    } 
+ 
+    public double getFeePercent() { return feePercent; } 
+} 
+//Item class Item {     private int itemId;     private String title;     private String description;     private double basePrice;     private User seller;     private boolean isOpen; 
+ 
+    public Item(int itemId, String title, String description, double basePrice, User seller) {         this.itemId = itemId;         this.title = title;         this.description = description;         this.basePrice = basePrice;         this.seller = seller;         this.isOpen = true; 
+    } 
+ 
+    public int getItemId() { return itemId; }     public String getTitle() { return title; }     public boolean isOpen() { return isOpen; }     public void close() { isOpen = false; }     public User getSeller() { return seller; }     public void display() { 
+        System.out.println("Item: " + title + " (Base: " + basePrice + ")"); 
+    } 
+} 
+//Bid class Bid {     private int bidId;     private Item item;     private User bidder;     private double amount;     private Date time; 
+ 
+    public Bid(int bidId, Item item, User bidder, double amount) {         this.bidId = bidId;         this.item = item;         this.bidder = bidder;         this.amount = amount;         this.time = new Date(); 
+    } 
+ 
+    public double getAmount() { return amount; }     public User getBidder() { return bidder; }     public Item getItem() { return item; } 
+} 
+//AuctionService class AuctionService {     private List<Item> items = new ArrayList<>();     private List<Bid> bids = new ArrayList<>(); 
+ 
+    public void listItem(Item item) {         items.add(item);         System.out.println("Item listed: " + item.getTitle()); 
+    } 
+    public void placeBid(int bidId, Item item, User bidder, double amount) {         if (item.isOpen()) {             bids.add(new Bid(bidId, item, bidder, amount)); 
+            System.out.println(bidder.getName() + " placed bid of " + amount + " on " + item.getTitle()); 
+        } else { 
+            System.out.println("Auction closed for this item."); 
+        } 
+    } 
+ 
+    public void placeBid(int bidId, Item item, User bidder, double amount, double autoMax) {         placeBid(bidId, item, bidder, Math.min(amount, autoMax)); 
+    } 
+ 
+    public void closeAuction(Item item) {         item.close(); 
+        System.out.println("Auction closed for item: " + item.getTitle()); 
+    } 
+ 
+    public void declareWinner(Item item) {         Bid winner = null;         for (Bid bid : bids) {             if (bid.getItem().equals(item)) {                 if (winner == null || bid.getAmount() > winner.getAmount()) { 
+                    winner = bid; 
+                } 
+            } 
+        } 
+        if (winner != null) { 
+            System.out.println("Winner for " + item.getTitle() + ": " + winner.getBidder().getName() + 
+                               " with bid " + winner.getAmount()); 
+        } else { 
+            System.out.println("No bids placed for item: " + item.getTitle()); 
+        } 
+    } 
+} 
+//AuctionAppMain public class AuctionAppMain {     public static void main(String[] args) { 
+        AuctionService auctionService = new AuctionService(); 
+        User buyer1 = new User(1, "Kumar", "kumar@mail.com", 4.5, "Buyer");         VerifiedSeller seller1 = new VerifiedSeller(2, "Ravi", "ravi@mail.com", 4.9);)         buyer1.display();         seller1.display(); 
+        Item item1 = new Item(101, "Laptop", "Gaming Laptop", 25000, seller1);         auctionService.listItem(item1);         auctionService.placeBid(201, item1, buyer1, 27000);         auctionService.placeBid(202, item1, buyer1, 28000, 30000); // overloaded method         auctionService.closeAuction(item1);         auctionService.declareWinner(item1); 
+    } 
+} 
+
